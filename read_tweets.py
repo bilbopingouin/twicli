@@ -1,63 +1,74 @@
 #!/usr/bin/python
 
+import sys
+import os
+import getopt;
 from twitter import *
-import json
-from pprint import pprint
 
-# see "Authentication" section below for tokens and keys
+# Default values
+def_counts = 10
+user = "bilbo_pingouin"
+
+# input parameters
+def usage():
+  print "Run: " + sys.argv[0] + " [OPTIONS]"
+  print "Where OPTIONS is one the following: "
+  print " -h --help"
+  print " -c N --counts=N"
+  print " -u \"name\" --user=\"name\""
+
+def main(argv):
+  try: 
+    opts, args = getopt.getopt(argv,"hc:u:",["help","counts=","user="])
+  except getopt.GetoptError:
+    usage()
+    exit(2)
+  for opt,arg in opts:
+    if opt in ["-h","--help"]:
+      usage()
+      exit(1)
+    elif opt in ["-c","--counts"]:
+      print "Retrieving "+str(arg)+" tweets."
+      def_counts = arg
+    elif opt in ["-u","--user"]:
+      print "User: "+arg
+      user = arg
+    else:
+      print "Got the following and I don't know what to do with it:"
+      print opt + " " + arg
+      usage()
+      exit(2)
+  
+
+if __name__ == "__main__":
+  main(sys.argv[1:])
+
+# Retrieve the credentials for a given account
+dir_creds = "~/.twit_cli/"
+if not os.path.exists(dir_creds):
+  os.makedirs(dir_creds) # I just assume there is not race issue here!
+
+file_creds = dir_creds + user + ".token"
+MY_TWITTER_CREDS = os.path.expanduser(file_creds)
+
+if not os.path.exists(MY_TWITTER_CREDS):
+  oauth_dance("Twit on CLI", CONSUMER_KEY, CONSUMER_SECRET,
+	                  MY_TWITTER_CREDS)
+
+oauth_token, oauth_secret = read_token_file(MY_TWITTER_CREDS)
+
+# OAuth idnetification
 t = Twitter(
-    auth=OAuth("17920223-IJrEHRqVdY9gIna906qC5iKXHD56Lle2fWZIvNjAJ","Bsv6vqtbqlNsZvm6uC28vU3iALWgj8ezoVZ2AbzvfyI0p", 
+    auth=OAuth(oauth_token,oauth_secret, 
 		  "RkRkt25BDe2IDyM6QhorQ","S5o6nll11syRtwAPufzlNpsrDOAvzGeTzbNOxQ72eM")
     )
+#TODO: try to setup a page on my server where those values could be obtained!
 
-# Get your "home" timeline
-#data_out = open("data.json","w")
-#data = t.statuses.home_timeline()
-#data_parsed = json.loads(data)
-#pprint(data_parsed)
-#data_out.write()
-#data.close()
+# Get status
+data = t.statuses.home_timeline(count=def_counts)
 
-# Get a particular friend's timeline
-#t.statuses.friends_timeline(id="billybob")
+# Print lines
+for c in range(len(data)):
+  print "* "+data[c]['user']['name']+'('+data[c]['user']['screen_name']+')'+" - "+data[c]['text']+" ## "+data[c]['created_at']
 
-# Also supported (but totally weird)
-#t.statuses.friends_timeline.billybob()
 
-# to pass in GET/POST parameters, such as `count`
-data = t.statuses.home_timeline(count=5)
-for c in range(5):
-  print data[c]['user']['name']+'('+data[c]['user']['screen_name']+')'+" - "+data[c]['text']+" ## "+data[c]['created_at']
-
-# to pass in the GET/POST parameter `id` you need to use `_id`
-#t.statuses.oembed(_id=1234567890)
-
-# Update your status
-#t.statuses.update(
-#          status="Using @sixohsix's sweet Python Twitter Tools.")
-
-# Send a direct message
-#t.direct_messages.new(
-#          user="billybob",
-#	      text="I think yer swell!")
-
-# Get the members of tamtar's list "Things That Are Rad"
-#t._("tamtar")._("things-that-are-rad").members()
-
-# Note how the magic `_` method can be used to insert data
-# into the middle of a call. You can also use replacement:
-#t.user.list.members(user="tamtar", list="things-that-are-rad")
-
-# An *optional* `_timeout` parameter can also be used for API
-# calls which take much more time than normal or twitter stops
-# responding for some reasone
-#t.users.lookup(screen_name=','.join(A_LIST_OF_100_SCREEN_NAMES), _timeout=1)
-
-# Overriding Method: GET/POST
-# you should not need to use this method as this library properly
-# detects whether GET or POST should be used, Nevertheless
-# to force a particular method, use `_method`
-#t.statuses.oembed(_id=1234567890, _method='GET')
-
-# Search for the latest tweets about #pycon
-#t.search.tweets(q="#pycon")
