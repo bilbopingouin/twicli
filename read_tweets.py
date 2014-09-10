@@ -2,7 +2,7 @@
 
 import sys
 import os
-import getopt;
+import getopt
 from twitter import *
 
 # Default values
