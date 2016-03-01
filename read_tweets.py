@@ -8,7 +8,7 @@ from twitter import *
 # Default values
 def_counts = 10
 users = []
-dir_creds = "~/.twit_cli/"
+dir_creds = "./data/oauth/"
 
 # input parameters
 def usage():
@@ -69,8 +69,9 @@ for user in users:
   MY_TWITTER_CREDS = os.path.expanduser(file_creds)
 
   #TODO: try to setup a page on my server where those values could be obtained!
-  if os.path.exists("./app_tokens.dat"):
-    cust_token, cust_secret = read_token_file(os.path.expanduser("./app_tokens.dat"))
+  api_token_file = "data/api_token.dat"
+  if os.path.exists(api_token_file):
+    cust_token, cust_secret = read_token_file(os.path.expanduser(api_token_file))
   else:
     print "ERROR: The app is not identified!"
 
