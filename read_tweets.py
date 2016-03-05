@@ -57,7 +57,7 @@ if __name__ == "__main__":
   main(sys.argv[1:])
 
 if len(users) < 1:
-  users.append["bilbo_pingouin"]
+  users.append("bilbo_pingouin")
 
 for user in users:
   print "\n"+user
