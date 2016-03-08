@@ -18,11 +18,12 @@ def usage():
   print " -c N --counts=N"
   print " -u \"name\" --user=\"name\""
   print " -a --all"
+  print " -l --list"
 
 def main(argv):
   global def_counts, users
   try: 
-    opts, args = getopt.getopt(argv,"hc:u:a",["help","counts=","user=","all"])
+    opts, args = getopt.getopt(argv,"hc:u:al",["help","counts=","user=","all","list"])
   except getopt.GetoptError:
     usage()
     exit(2)
@@ -39,13 +40,23 @@ def main(argv):
     elif opt in ["-a","--all"]:
       print "all users"
       if os.path.exists(os.path.expanduser(dir_creds)):
-	token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
-	for file in token_files:
-	  usr = file[:file.index(".token")]
-	  users.append(usr)
+        token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
+        for file in token_files:
+	        usr = file[:file.index(".token")]
+	        users.append(usr)
       else:
-	print "No user to be added, path undefined"
-	exit(2)
+        print "No user to be added, path undefined"
+        exit(2)
+    elif opt in ["-l","--list"]:
+      if os.path.exists(os.path.expanduser(dir_creds)):
+             token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
+             for file in token_files:
+               usr = file[:file.index(".token")]
+               print usr
+      else:
+             print "No user found, path undefined"
+             exit(2)
+      exit(1)
     else:
       print "Got the following and I don't know what to do with it:"
       print opt + " " + arg
