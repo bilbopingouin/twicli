@@ -69,9 +69,18 @@ if __name__ == "__main__":
 
 if len(users) < 1:
   users.append("bilbo_pingouin")
+  
+# for n in range(100):
+#     print n, '\033['+str(n)+'m'+"whatever"+'\033[0m'
+col_bgred   = '\033[41m'
+col_bold    = '\033[1m'
+col_fgblue  = '\033[34m'
+col_fggreen = '\033[32m'
+col_fggrey  = '\033[90m'
+col_end     = '\033[0m'
 
 for user in users:
-  print "\n"+user
+  print "\n" + col_bgred + col_bold + user + col_end
   # Retrieve the credentials for a given account
   if not os.path.exists(dir_creds):
     os.makedirs(dir_creds) # I just assume there is not race issue here!
@@ -100,6 +109,7 @@ for user in users:
 
   # Print lines
   for c in range(len(data)):
-    print "* "+data[c]['user']['name']+'('+data[c]['user']['screen_name']+')'+" - "+data[c]['text']+" ## "+data[c]['created_at']
+    #print "* "+data[c]['user']['name']+'('+data[c]['user']['screen_name']+')'+" - "+data[c]['text']+" ## "+data[c]['created_at']
+    print "* " + col_fggreen+col_bold+data[c]['user']['name']+col_end + ' (' + col_fgblue+data[c]['user']['screen_name']+col_end + ')' + " - " + data[c]['text'] + col_fggrey+" ## "+data[c]['created_at']+col_end
 
 
