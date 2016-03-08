@@ -18,12 +18,11 @@ def usage():
   print " -c N --counts=N"
   print " -u \"name\" --user=\"name\""
   print " -a --all"
-  print " -l --list"
 
 def main(argv):
   global def_counts, users
   try: 
-    opts, args = getopt.getopt(argv,"hc:u:al",["help","counts=","user=","all","list"])
+    opts, args = getopt.getopt(argv,"hc:u:a",["help","counts=","user=","all"])
   except getopt.GetoptError:
     usage()
     exit(2)
@@ -40,23 +39,13 @@ def main(argv):
     elif opt in ["-a","--all"]:
       print "all users"
       if os.path.exists(os.path.expanduser(dir_creds)):
-	      token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
-	      for file in token_files:
-	        usr = file[:file.index(".token")]
-	        users.append(usr)
+	token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
+	for file in token_files:
+	  usr = file[:file.index(".token")]
+	  users.append(usr)
       else:
-	      print "No user to be added, path undefined"
-	      exit(2)
-    elif opt in ["-l","--list"]:
-      if os.path.exists(os.path.expanduser(dir_creds)):
-	      token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
-	      for file in token_files:
-	        usr = file[:file.index(".token")]
-	        print usr
-      else:
-	      print "No user found, path undefined"
-	      exit(2)
-      exit(1)
+	print "No user to be added, path undefined"
+	exit(2)
     else:
       print "Got the following and I don't know what to do with it:"
       print opt + " " + arg
@@ -69,9 +58,18 @@ if __name__ == "__main__":
 
 if len(users) < 1:
   users.append("bilbo_pingouin")
+  
+# for n in range(100):
+#     print n, '\033['+str(n)+'m'+"whatever"+'\033[0m'
+col_bgred   = '\033[41m'
+col_bold    = '\033[1m'
+col_fgblue  = '\033[34m'
+col_fggreen = '\033[32m'
+col_fggrey  = '\033[90m'
+col_end     = '\033[0m'
 
 for user in users:
-  print "\n"+user
+  print "\n" + col_bgred + col_bold + user + col_end
   # Retrieve the credentials for a given account
   if not os.path.exists(dir_creds):
     os.makedirs(dir_creds) # I just assume there is not race issue here!
@@ -100,6 +98,6 @@ for user in users:
 
   # Print lines
   for c in range(len(data)):
-    print "* "+data[c]['user']['name']+'('+data[c]['user']['screen_name']+')'+" - "+data[c]['text']+" ## "+data[c]['created_at']
+    print "* " + col_fggreen+col_bold+data[c]['user']['name']+col_end + ' (' + col_fgblue+data[c]['user']['screen_name']+col_end + ')' + " - " + data[c]['text'] + col_fggrey+" ## "+data[c]['created_at']+col_end
 
 
