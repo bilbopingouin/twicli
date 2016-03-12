@@ -6,12 +6,30 @@
 import sys
 import os
 import argparse
+import colorama
 from twitter import *
 
 # Default values
 def_counts = 10
 users = []
 dir_creds = "./data/oauth/"
+
+# Colorama: init() for windows parsing
+colorama.init()
+# for n in range(100):
+#     print n, '\033['+str(n)+'m'+"whatever"+'\033[0m'
+col_bgred   = colorama.Back.RED
+col_bgblue  = colorama.Back.BLUE
+
+col_bold    = colorama.Style.BRIGHT
+
+col_fgred   = colorama.Fore.RED
+col_fgblue  = colorama.Fore.BLUE
+col_fggreen = colorama.Fore.GREEN
+col_fggrey  = '\x1b[90m' # this is grey
+
+col_end     = colorama.Style.RESET_ALL
+
 
 
 def main(argv):
@@ -34,7 +52,7 @@ def main(argv):
         users.append(user)
 
     if options.all or options.list:
-        print("all users")
+        print(col_fgred + "All users:" + col_end)
         if os.path.exists(os.path.expanduser(dir_creds)):
             token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
             for f in token_files:
@@ -46,7 +64,7 @@ def main(argv):
             if options.list:
                 exit(0)
         else:
-            print("No user to be added, path undefined")
+            print(col_bgblue + "No user to be added, path undefined" + col_end)
             exit(2)
 
 
@@ -56,14 +74,6 @@ if __name__ == "__main__":
 if len(users) < 1:
     users.append("bilbo_pingouin")
 
-# for n in range(100):
-#     print n, '\033['+str(n)+'m'+"whatever"+'\033[0m'
-col_bgred   = '\033[41m'
-col_bold    = '\033[1m'
-col_fgblue  = '\033[34m'
-col_fggreen = '\033[32m'
-col_fggrey  = '\033[90m'
-col_end     = '\033[0m'
 
 for user in users:
     print ("\n" + col_bgred + col_bold + user + col_end)
