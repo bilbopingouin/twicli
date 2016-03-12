@@ -1,8 +1,12 @@
 #!/usr/bin/python
+# https://codereview.stackexchange.com/questions/122449/cli-twitter-client-in-python
+# https://pymotw.com/2/argparse/
+# https://stackoverflow.com/questions/7427101/dead-simple-argparse-example-wanted-1-argument-3-results
+# https://docs.python.org/3/library/argparse.html
 
 import sys
 import os
-import getopt
+import argparse
 from twitter import *
 
 # Default values
@@ -10,57 +14,40 @@ def_counts = 10
 users = []
 dir_creds = "./data/oauth/"
 
-# input parameters
-def usage():
-    print "Run: " + sys.argv[0] + " [OPTIONS]"
-    print "Where OPTIONS is one the following: "
-    print " -h --help"
-    print " -c N --counts=N"
-    print " -u \"name\" --user=\"name\""
-    print " -a --all"
-    print " -l --list"
 
 def main(argv):
     global def_counts, users
-    try: 
-	opts, args = getopt.getopt(argv,"hc:u:al",["help","counts=","user=","all","list"])
-    except getopt.GetoptError:
-	usage()
-	exit(2)
-    for opt,arg in opts:
-	if opt in ["-h","--help"]:
-	    usage()
-	    exit(1)
-	elif opt in ["-c","--counts"]:
-	    print "Retrieving "+str(arg)+" tweets."
-	    def_counts = arg
-	elif opt in ["-u","--user"]:
-	    print "User: "+arg
-	    users.append(arg)
-	elif opt in ["-a","--all"]:
-	    print "all users"
-	    if os.path.exists(os.path.expanduser(dir_creds)):
-		token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
-		for file in token_files:
-		    usr = file[:file.index(".token")]
+
+    user = ''
+    
+    parser = argparse.ArgumentParser(description='twicli Twitter App')
+    parser.add_argument('-c', '--counts', help='Count of tweets to retrieve.', required=False, action="store", dest="def_counts", type=int)
+    parser.add_argument('-u', '--user',	  help='Username',		       required=False, action="store", dest="user")
+    parser.add_argument('-a', '--all',    help='All Users',		       required=False, action="store_true")
+    parser.add_argument('-l', '--list',   help='List available users',	       required=False, action="store_true")
+    try:
+	options = parser.parse_args()
+    except:
+	parser.print_help()
+	sys.exit(0)
+
+    if len(user)>0:
+	users.append(user)
+
+    if options.all or options.list:
+	print "all users"
+	if os.path.exists(os.path.expanduser(dir_creds)):
+	    token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
+	    for f in token_files:
+		usr = f[:f.index(".token")]
+		if options.all:
 		    users.append(usr)
-	    else:
-		print "No user to be added, path undefined"
-		exit(2)
-	elif opt in ["-l","--list"]:
-	    if os.path.exists(os.path.expanduser(dir_creds)):
-		token_files = filter(lambda x: x.endswith('.token'), os.listdir(os.path.expanduser(dir_creds)))
-		for file in token_files:
-		    usr = file[:file.index(".token")]
-		    print usr
-	    else:
-		print "No user found, path undefined"
-		exit(2)
-	    exit(1)
+		else:
+		    print usr     
+	    if options.list:
+		exit(0)
 	else:
-	    print "Got the following and I don't know what to do with it:"
-	    print opt + " " + arg
-	    usage()
+	    print "No user to be added, path undefined"
 	    exit(2)
 
 
