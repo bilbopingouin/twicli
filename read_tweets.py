@@ -104,13 +104,10 @@ for user in users:
     data = t.statuses.home_timeline(count=def_counts)
 
     # Print lines
-    for c in range(len(data)):
+    for t in data:
         twit = '* '
-        twit += col_fggreen+col_bold+data[c]['user']['name']+col_end
-        twit += ' (' + col_fgblue+data[c]['user']['screen_name']+col_end + ')'
-        twit += " - " + data[c]['text']
-        twit += col_fggrey+" ## "+data[c]['created_at']+col_end
+        twit += col_fggreen+col_bold + t['user']['name'] + col_end
+        twit += ' (' + col_fgblue + t['user']['screen_name'] + col_end + ')'
+        twit += " - " + t['text']
+        twit += col_fggrey + " ## " + t['created_at'] + col_end
         print(twit)
-        #print "* " + col_fggreen+col_bold+data[c]['user']['name']+col_end + ' (' + col_fgblue+data[c]['user']['screen_name']+col_end + ')' + " - " + data[c]['text'] + col_fggrey+" ## "+data[c]['created_at']+col_end
-
-
