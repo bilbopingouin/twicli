@@ -3,13 +3,15 @@
 import sys
 import os
 import argparse
+import string
 import colorama
 from twitter import *
 
 # Default values
 def_counts = 10
 users = []
-dir_creds = "./data/oauth/"
+search_terms = ''
+dir_creds = './data/oauth/'
 
 # Colorama: init() for windows parsing
 colorama.init()
@@ -30,23 +32,31 @@ col_end     = colorama.Style.RESET_ALL
 
 # Argument(s) parsing
 def main(argv):
-    global def_counts, users
+    global def_counts, users, search_terms
 
-    user = ''
+    #user = ''
     
     parser = argparse.ArgumentParser(description=col_bold+'twicli Twitter App'+col_end)
-    parser.add_argument('-c', '--counts', help='Count of tweets to retrieve.',  required=False, action='store', dest='def_counts', type=int)
+    parser.add_argument('-c', '--counts', help='Count of tweets to retrieve.',  required=False, action='store', dest='counts', type=int)
     parser.add_argument('-u', '--user',   help='Username',	                required=False, action='store', dest='user')
     parser.add_argument('-a', '--all',    help='All Users',	                required=False, action='store_true')
     parser.add_argument('-l', '--list',   help='List available users',          required=False, action='store_true')
+    parser.add_argument('-s', '--search', help='Search terms on twitter using the default account', required=False, action='store_true')
+    parser.add_argument('search_term',    help='Terms searched using [-s]', nargs='*') # nargs='+' means at least 1, '*' any number, '?' one https://docs.python.org/dev/library/argparse.html#nargs
     try:
         options = parser.parse_args()
     except:
         parser.print_help()
         sys.exit(0)
+        
+    #print(options)
 
-    if len(user)>0:
-        users.append(user)
+    if options.user:
+        users.append(options.user)
+        #print(users)
+        
+    if options.counts:
+        def_counts=options.counts
 
     if options.all or options.list:
         print(col_fgred + 'All users:' + col_end)
@@ -63,6 +73,10 @@ def main(argv):
         else:
             print(col_bgblue + 'No user to be added, path undefined' + col_end)
             exit(2)
+            
+    if options.search:
+        search_terms = string.join(options.search_term, ' ')
+        #print(search_terms)
 
 
 if __name__ == '__main__':
@@ -73,7 +87,7 @@ if len(users) < 1:
 
 
 for user in users:
-    print ("\n" + col_bgred + col_bold + user + col_end)
+    print ("\n" + str(def_counts) + " from " + col_bgred + col_bold + user + col_end)
     
     # API Token
     api_token_file = 'data/api_token.dat'
@@ -99,10 +113,20 @@ for user in users:
     oauth_token, oauth_secret = read_token_file(MY_TWITTER_CREDS)
 
     # OAuth idnetification
-    t = Twitter(auth=OAuth(oauth_token,oauth_secret,cust_token,cust_secret))
+    tapi = Twitter(auth=OAuth(oauth_token,oauth_secret,cust_token,cust_secret))
 
-    # Get status
-    data = t.statuses.home_timeline(count=def_counts)
+    # Are we searching something?
+    if len(search_terms)>0:
+        total_data = tapi.search.tweets(q=search_terms,count=def_counts)
+        data = total_data['statuses']
+        #print(data)
+        #for t in data:
+        #    print(t)
+        #    for t1 in data[t]:
+        #        print(t1['user'])
+    else:
+        # Get status
+        data = tapi.statuses.home_timeline(count=def_counts)
 
     # Print lines
     for t in data:
