@@ -3,13 +3,15 @@
 import sys
 import os
 import argparse
+import string
 import colorama
 from twitter import *
 
 # Default values
 def_counts = 10
 users = []
-dir_creds = "./data/oauth/"
+search_terms = ''
+dir_creds = './data/oauth/'
 
 # Colorama: init() for windows parsing
 colorama.init()
@@ -30,7 +32,7 @@ col_end     = colorama.Style.RESET_ALL
 
 # Argument(s) parsing
 def main(argv):
-    global def_counts, users
+    global def_counts, users, search_terms
 
     user = ''
     
@@ -39,6 +41,8 @@ def main(argv):
     parser.add_argument('-u', '--user',   help='Username',	                required=False, action='store', dest='user')
     parser.add_argument('-a', '--all',    help='All Users',	                required=False, action='store_true')
     parser.add_argument('-l', '--list',   help='List available users',          required=False, action='store_true')
+    parser.add_argument('-s', '--search', help='Search terms on twitter using the default account', required=False, action='store_true')
+    parser.add_argument('search_term',    help='Terms searched using [-s]', nargs='+')
     try:
         options = parser.parse_args()
     except:
@@ -63,6 +67,10 @@ def main(argv):
         else:
             print(col_bgblue + 'No user to be added, path undefined' + col_end)
             exit(2)
+            
+    if options.search:
+        search_terms = string.join(options.search_term, ' ')
+        print(search_terms)
 
 
 if __name__ == '__main__':
@@ -99,10 +107,20 @@ for user in users:
     oauth_token, oauth_secret = read_token_file(MY_TWITTER_CREDS)
 
     # OAuth idnetification
-    t = Twitter(auth=OAuth(oauth_token,oauth_secret,cust_token,cust_secret))
+    tapi = Twitter(auth=OAuth(oauth_token,oauth_secret,cust_token,cust_secret))
 
-    # Get status
-    data = t.statuses.home_timeline(count=def_counts)
+    # Are we searching something?
+    if len(search_terms)>0:
+        total_data = tapi.search.tweets(q=search_terms,count=def_counts)
+        data = total_data['statuses']
+        #print(data)
+        #for t in data:
+        #    print(t)
+        #    for t1 in data[t]:
+        #        print(t1['user'])
+    else:
+        # Get status
+        data = tapi.statuses.home_timeline(count=def_counts)
 
     # Print lines
     for t in data:
