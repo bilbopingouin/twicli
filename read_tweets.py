@@ -41,15 +41,15 @@ def main(argv):
     parser.add_argument('-u', '--user',   help='Username',	                required=False, action='store', dest='user')
     parser.add_argument('-a', '--all',    help='All Users',	                required=False, action='store_true')
     parser.add_argument('-l', '--list',   help='List available users',          required=False, action='store_true')
-    parser.add_argument('-s', '--search', help='Search terms on twitter using the default account', required=False, action='store', dest='search_terms')
-    #parser.add_argument('search_term',    help='Terms searched using [-s]', nargs='+')
+    parser.add_argument('-s', '--search', help='Search terms on twitter using the default account', required=False, action='store_true')
+    parser.add_argument('search_term',    help='Terms searched using [-s]', nargs='+')
     try:
         options = parser.parse_args()
     except:
         parser.print_help()
         sys.exit(0)
         
-    print(options)
+    #print(options)
 
     if options.user:
         users.append(options.user)
@@ -74,9 +74,9 @@ def main(argv):
             print(col_bgblue + 'No user to be added, path undefined' + col_end)
             exit(2)
             
-    #if options.search:
-    #    search_terms = string.join(options.search_term, ' ')
-    #    print(search_terms)
+    if options.search:
+        search_terms = string.join(options.search_term, ' ')
+        #print(search_terms)
 
 
 if __name__ == '__main__':
