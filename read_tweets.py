@@ -42,7 +42,7 @@ def main(argv):
     parser.add_argument('-a', '--all',    help='All Users',	                required=False, action='store_true')
     parser.add_argument('-l', '--list',   help='List available users',          required=False, action='store_true')
     parser.add_argument('-s', '--search', help='Search terms on twitter using the default account', required=False, action='store_true')
-    parser.add_argument('search_term',    help='Terms searched using [-s]', nargs='+')
+    parser.add_argument('search_term',    help='Terms searched using [-s]', nargs='*') # nargs='+' means at least 1, '*' any number, '?' one https://docs.python.org/dev/library/argparse.html#nargs
     try:
         options = parser.parse_args()
     except:
